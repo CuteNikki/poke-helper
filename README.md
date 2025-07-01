@@ -12,23 +12,31 @@ Welcome to **Poke Helper**! This project is the foundation for a feature-rich Di
 
 ## 🚀 Getting Started
 
-**Install dependencies:**
+**1. Install dependencies:**
 
 ```bash
 bun install
 ```
 
-**Run the bot:**
+**2. Fill in the `.env` file**
+
+**3. Register commands:**
 
 ```bash
-bun run src/index.ts
+bun run register
+```
+
+**4. Run the bot:**
+
+```bash
+bun run dev
 ```
 
 ## 🛠️ Tech Stack
 
 - [Bun](https://bun.sh) — Fast all-in-one JavaScript runtime
-- TypeScript — Type safety and modern JS features
-- Discord.js — For Discord API integration
+- [TypeScript](https://www.typescriptlang.org/) — Type safety and modern JS features
+- [Discord.js](https://discord.js.org/) — For Discord API integration
 
 ## 🤝 Contributing
 
@@ -37,4 +45,4 @@ If you'd like to contribute ideas, code, or feedback, feel free to open an issue
 
 ## 📄 License
 
-This project is licensed under the MIT License.
+This project is licensed under the [MIT License](LICENSE).
