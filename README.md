@@ -1,15 +1,40 @@
-# poke-helper
+# Poke Helper
 
-To install dependencies:
+_A Pokémon Themed Discord Bot_
+
+Welcome to **Poke Helper**! This project is the foundation for a feature-rich Discord bot designed for Pokémon-themed servers. While we're just getting started, our goal is to provide a suite of utilities and fun features to enhance your Pokémon community experience.
+
+## ✨ Planned Features
+
+- Minigames (counting and more)
+- Customizable server utilities
+- Moderation helpers
+
+## 🚀 Getting Started
+
+**Install dependencies:**
 
 ```bash
 bun install
 ```
 
-To run:
+**Run the bot:**
 
 ```bash
-bun run index.ts
+bun run src/index.ts
 ```
 
-This project was created using `bun init` in bun v1.2.16. [Bun](https://bun.sh) is a fast all-in-one JavaScript runtime.
+## 🛠️ Tech Stack
+
+- [Bun](https://bun.sh) — Fast all-in-one JavaScript runtime
+- TypeScript — Type safety and modern JS features
+- Discord.js — For Discord API integration
+
+## 🤝 Contributing
+
+We're in the early stages!  
+If you'd like to contribute ideas, code, or feedback, feel free to open an issue or pull request.
+
+## 📄 License
+
+This project is licensed under the MIT License.
