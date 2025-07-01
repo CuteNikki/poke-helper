@@ -1,0 +1,21 @@
+{
+  "name": "poke-helper",
+  "module": "src/index.ts",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "dev": "bun run src/index.ts",
+    "format": "prettier --write .",
+    "lint": "eslint . --ext .ts,.tsx"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.30.0",
+    "@types/bun": "latest",
+    "eslint": "^9.30.0",
+    "prettier": "^3.6.2",
+    "typescript-eslint": "^8.35.1"
+  },
+  "peerDependencies": {
+    "typescript": "^5.8.3"
+  }
+}
