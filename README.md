@@ -2,7 +2,7 @@
 
 _A Pokémon Themed Discord Bot_
 
-Welcome to **Poke Helper**! This project is the foundation for a Discord bot designed for a Pokémon-themed servers. While we're just getting started, our goal is to provide a suite of utilities and fun features to enhance your Pokémon community experience.
+Welcome to **Poke Helper**! This project is the foundation for a Discord bot designed for a Pokémon-themed server. While we're just getting started, our goal is to provide a suite of utilities and fun features to enhance your Pokémon community experience.
 
 ## ✨ Planned Features
 
