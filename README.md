@@ -2,13 +2,11 @@
 
 _A Pokémon Themed Discord Bot_
 
-Welcome to **Poke Helper**! This project is the foundation for a feature-rich Discord bot designed for Pokémon-themed servers. While we're just getting started, our goal is to provide a suite of utilities and fun features to enhance your Pokémon community experience.
+Welcome to **Poke Helper**! This project is the foundation for a Discord bot designed for a Pokémon-themed servers. While we're just getting started, our goal is to provide a suite of utilities and fun features to enhance your Pokémon community experience.
 
 ## ✨ Planned Features
 
 - Minigames (counting and more)
-- Customizable server utilities
-- Moderation helpers
 
 ## 🛠️ Tech Stack
 
@@ -28,7 +26,7 @@ bun install
 
 **2. Set up the Environment:**
 
-When [creating your Discord Bot Application](https://discord.com/developers/applications), make sure to enable the privileged intents Message Content.
+When [creating your Discord Bot Application](https://discord.com/developers/applications), make sure to enable the privileged intents `Message Content`.
 
 Creating the database:
 
@@ -54,7 +52,7 @@ postgresql://myuser:mypass@localhost:5432/mydb
 
 Now fill in the `.env` file. There is an example file in this project.
 
-Creates or update tables in your database:
+Create or update tables in your database:
 
 ```bash
 bunx prisma migrate dev
@@ -80,8 +78,13 @@ bun run dev
 
 ## 🤝 Contributing
 
-We're in the early stages!  
-If you'd like to contribute ideas, code, or feedback, feel free to open an issue or pull request.
+We're in the early stages! Any contributions, issues and feature requests are welcome.
+
+If you'd like to contribute ideas, code, or feedback, feel free to [open an issue](https://github.com/CuteNikki/poke-helper/issues) or [pull request](https://github.com/CuteNikki/poke-helper/pulls).
+
+## ⭐ Show your Support
+
+Please star this repository if this project helped you!
 
 ## 📄 License
 
