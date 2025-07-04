@@ -10,6 +10,14 @@ Welcome to **Poke Helper**! This project is the foundation for a feature-rich Di
 - Customizable server utilities
 - Moderation helpers
 
+## 🛠️ Tech Stack
+
+- [Bun](https://bun.sh) — Fast all-in-one JavaScript runtime
+- [TypeScript](https://www.typescriptlang.org/) — Type safety and modern JS features
+- [Discord.js](https://discord.js.org/) — For Discord API integration
+- [Prisma](https://www.prisma.io/) — Type-safe ORM for database access
+- [PostgreSQL](https://www.postgresql.org/) — Reliable open-source relational database
+
 ## 🚀 Getting Started
 
 **1. Install dependencies:**
@@ -69,14 +77,6 @@ bun run register
 ```bash
 bun run dev
 ```
-
-## 🛠️ Tech Stack
-
-- [Bun](https://bun.sh) — Fast all-in-one JavaScript runtime
-- [TypeScript](https://www.typescriptlang.org/) — Type safety and modern JS features
-- [Discord.js](https://discord.js.org/) — For Discord API integration
-- [Prisma](https://www.prisma.io/) — Type-safe ORM for database access
-- [PostgreSQL](https://www.postgresql.org/) — Reliable open-source relational database
 
 ## 🤝 Contributing
 
