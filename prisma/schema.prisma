@@ -1,0 +1,47 @@
+generator client {
+  provider      = "prisma-client-js"
+  binaryTargets = ["native", "rhel-openssl-3.0.x"]
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Guild {
+  guildId String @id
+
+  // Configuration
+  counting Counting? @relation("GuildCounting")
+
+  // Timestamps
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Counting {
+  id      Int    @id @default(autoincrement())
+  guildId String @unique
+  Guild   Guild  @relation("GuildCounting", fields: [guildId], references: [guildId])
+
+  // Configuration
+  resetOnFail Boolean @default(false)
+  channelId   String
+
+  // State
+  currentNumber         Int       @default(0)
+  currentNumberAt       DateTime?
+  currentNumberByUserId String?
+
+  // History
+  highestNumber         Int       @default(0)
+  highestNumberAt       DateTime?
+  highestNumberByUserId String?
+
+  // Timestamps
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Indexes
+  @@index([channelId])
+}

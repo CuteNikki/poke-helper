@@ -1,0 +1,179 @@
+import {
+  ApplicationIntegrationType,
+  channelMention,
+  ChannelType,
+  ChatInputCommandInteraction,
+  InteractionContextType,
+  MessageFlags,
+  PermissionFlagsBits,
+  SlashCommandBuilder,
+  time,
+  TimestampStyles,
+  userMention,
+} from 'discord.js';
+
+import { Command } from '../classes/base/command';
+import { createCounting, getCounting, resetCounting, updateCounting } from '../database/counting';
+
+export default new Command({
+  data: new SlashCommandBuilder()
+    .setContexts(InteractionContextType.Guild)
+    .setIntegrationTypes(ApplicationIntegrationType.GuildInstall)
+    .setDefaultMemberPermissions(PermissionFlagsBits.ManageChannels)
+    .setName('counting')
+    .setDescription('A fun counting game for your community!')
+    .addSubcommand((cmd) =>
+      cmd
+        .setName('setup')
+        .setDescription('Set up the counting game')
+        .addChannelOption((option) =>
+          option.setName('channel').setDescription('The channel that should be used for counting').addChannelTypes(ChannelType.GuildText).setRequired(true),
+        )
+        .addBooleanOption((option) => option.setName('reset').setDescription('Reset the current number if a wrong number was sent').setRequired(false)),
+    )
+    .addSubcommand((cmd) =>
+      cmd
+        .setName('edit')
+        .setDescription('Edit the counting game configuration')
+        .addChannelOption((option) =>
+          option.setName('channel').setDescription('The channel that should be used for counting').addChannelTypes(ChannelType.GuildText).setRequired(false),
+        )
+        .addBooleanOption((option) => option.setName('reset').setDescription('Reset the current number if a wrong number was sent').setRequired(false)),
+    )
+    .addSubcommand((cmd) => cmd.setName('info').setDescription('Get information about the counting game'))
+    .addSubcommand((cmd) => cmd.setName('reset').setDescription('Reset the counting game')),
+  async execute(interaction) {
+    if (!interaction.inCachedGuild()) return;
+    console.log(`Counting command executed`);
+
+    await interaction.deferReply({ flags: [MessageFlags.Ephemeral] });
+
+    const subcommand = interaction.options.getSubcommand();
+
+    switch (subcommand) {
+      case 'setup':
+        await handleSetup(interaction);
+        break;
+      case 'edit':
+        await handleEdit(interaction);
+        break;
+      case 'info':
+        await handleInfo(interaction);
+        break;
+      case 'reset':
+        await handleReset(interaction);
+        break;
+      default:
+        interaction.editReply({
+          content: 'Unknown subcommand. Please use one of the following: setup, edit, info, reset.',
+        });
+        break;
+    }
+  },
+});
+
+/**
+ * Handle the setup subcommand for the counting game.
+ * @param interaction {ChatInputCommandInteraction<CacheType>} The interaction object for the command.
+ * @returns {Promise<unknown>} A promise that resolves when the setup is complete.
+ */
+async function handleSetup(interaction: ChatInputCommandInteraction<'cached'>): Promise<unknown> {
+  const currentCounting = await getCounting(interaction.guildId);
+
+  if (currentCounting) {
+    return interaction.editReply({
+      content:
+        'A counting game is already set up in this server. Please use the edit command to change the settings. Or reset the counting game if you want to start over.',
+    });
+  }
+
+  const channel = interaction.options.getChannel('channel', true, [ChannelType.GuildText]);
+  const resetOnFail = interaction.options.getBoolean('reset') ?? false;
+
+  await createCounting(interaction.guildId, channel.id, resetOnFail);
+  return interaction.editReply({
+    content: `Counting game has been set up in <#${channel.id}>. Use the edit command to change the settings or reset the counting game if needed.\n\nTo start counting, simply send the number 1 in the channel.`,
+  });
+}
+
+/**
+ * Handle the edit subcommand for the counting game.
+ * @param interaction {ChatInputCommandInteraction<CacheType>} The interaction object for the command.
+ * @returns {Promise<unknown>} A promise that resolves when the edit is complete.
+ */
+async function handleEdit(interaction: ChatInputCommandInteraction<'cached'>): Promise<unknown> {
+  const currentCounting = await getCounting(interaction.guildId);
+
+  if (!currentCounting) {
+    return interaction.editReply({
+      content: 'No counting game is set up in this server. Please use the setup command to create one.',
+    });
+  }
+
+  const channel = interaction.options.getChannel('channel', false, [ChannelType.GuildText]);
+  const resetOnFail = interaction.options.getBoolean('reset');
+
+  if (!channel && resetOnFail === undefined) {
+    return interaction.editReply({
+      content: 'You must provide at least one option to edit the counting game. Either a new channel or reset on fail option.',
+    });
+  }
+
+  await updateCounting(interaction.guildId, {
+    channelId: channel?.id ?? currentCounting.channelId,
+    resetOnFail: resetOnFail ?? currentCounting.resetOnFail,
+  });
+
+  return interaction.editReply({
+    content: `Counting game has been updated. Channel: <#${currentCounting.channelId}>. Reset on fail: ${currentCounting.resetOnFail}`,
+  });
+}
+
+/**
+ * Handle the info subcommand for the counting game.
+ * @param interaction {ChatInputCommandInteraction<CacheType>} The interaction object for the command.
+ * @returns {Promise<unknown>} A promise that resolves when the info is retrieved.
+ */
+async function handleInfo(interaction: ChatInputCommandInteraction<'cached'>): Promise<unknown> {
+  const currentCounting = await getCounting(interaction.guildId);
+
+  if (!currentCounting) {
+    return interaction.editReply({
+      content: 'No counting game is set up in this server. Please use the setup command to create one.',
+    });
+  }
+
+  return interaction.editReply({
+    content: [
+      `Counting game is set up in ${channelMention(currentCounting.channelId)}`,
+      `Reset on fail: ${currentCounting.resetOnFail ? 'enabled' : 'disabled'}`,
+      `Current number: ${currentCounting.currentNumber ?? 0}`,
+      `Current number by: ${currentCounting.currentNumberByUserId ? userMention(currentCounting.currentNumberByUserId) : 'N/A'}`,
+      `Current number at: ${currentCounting.currentNumberAt ? time(Math.floor(currentCounting.currentNumberAt.getTime() / 1000), TimestampStyles.ShortDateTime) : 'N/A'}`,
+      `Highest number: ${currentCounting.highestNumber ?? 0}`,
+      `Highest number by: ${currentCounting.highestNumberByUserId ? userMention(currentCounting.highestNumberByUserId) : 'N/A'}`,
+      `Highest number at: ${currentCounting.highestNumberAt ? time(Math.floor(currentCounting.highestNumberAt.getTime() / 1000), TimestampStyles.ShortDateTime) : 'N/A'}`,
+    ].join('\n'),
+  });
+}
+
+/**
+ * Handle the reset subcommand for the counting game.
+ * @param interaction {ChatInputCommandInteraction<CacheType>} The interaction object for the command.
+ * @returns {Promise<unknown>} A promise that resolves when the reset is complete.
+ */
+async function handleReset(interaction: ChatInputCommandInteraction<'cached'>): Promise<unknown> {
+  const currentCounting = await getCounting(interaction.guildId);
+
+  if (!currentCounting) {
+    return interaction.editReply({
+      content: 'No counting game is set up in this server. Please use the setup command to create one.',
+    });
+  }
+
+  await resetCounting(interaction.guildId);
+
+  return interaction.editReply({
+    content: 'The counting game has been reset. You can set it up again using the setup command.',
+  });
+}

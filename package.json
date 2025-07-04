@@ -20,8 +20,10 @@
     "typescript": "^5.8.3"
   },
   "dependencies": {
+    "@prisma/client": "^6.11.1",
     "chalk": "^5.4.1",
     "discord.js": "^14.21.0",
-    "globby": "^14.1.0"
+    "globby": "^14.1.0",
+    "prisma": "^6.11.1"
   }
 }

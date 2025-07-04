@@ -1,6 +1,7 @@
 import { Collection, Events, MessageFlags, time, TimestampStyles } from 'discord.js';
 
 import { Event } from '../classes/base/event';
+import { getGuildOrCreate } from '../database/guild';
 
 export default new Event({
   name: Events.InteractionCreate,
@@ -14,6 +15,11 @@ export default new Event({
     if (!command) {
       console.warn(`Command not found: ${interaction.commandName}`);
       return;
+    }
+
+    // Ensure the guild is in the database
+    if (interaction.inGuild()) {
+      await getGuildOrCreate(interaction.guildId);
     }
 
     // Handling cooldowns for the command
