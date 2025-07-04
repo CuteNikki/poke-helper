@@ -1,4 +1,5 @@
-import { Events } from 'discord.js';
+import { Colors, ContainerBuilder, Events, MessageFlags, TextDisplayBuilder } from 'discord.js';
+
 import { Event } from '../classes/base/event';
 import { getCounting, incrementCountingCount, resetCountingCount } from '../database/counting';
 
@@ -17,7 +18,12 @@ export default new Event({
     if (counting.currentNumberByUserId === message.author.id) {
       const warnMessage = await message
         .reply({
-          content: `You cannot count twice in a row! Please wait for someone else to count.`,
+          components: [
+            new ContainerBuilder()
+              .setAccentColor(Colors.Red)
+              .addTextDisplayComponents(new TextDisplayBuilder().setContent('You cannot count twice in a row! Please wait for someone else to count.')),
+          ],
+          flags: [MessageFlags.IsComponentsV2],
         })
         .catch(console.error);
       // Delete the warning after 3 seconds
@@ -36,7 +42,14 @@ export default new Event({
       if (counting.resetOnFail) {
         await resetCountingCount(message.guildId);
         await message.reply({
-          content: `Wrong number! The counting has been reset to 0. Please start over by sending the number 1.`,
+          components: [
+            new ContainerBuilder()
+              .setAccentColor(Colors.Red)
+              .addTextDisplayComponents(
+                new TextDisplayBuilder().setContent('### Wrong number!\nThe counting has been reset. Please start over by sending the number `1`.'),
+              ),
+          ],
+          flags: [MessageFlags.IsComponentsV2],
         });
       } else {
         await message.delete().catch(console.error);

@@ -3,10 +3,13 @@ import {
   channelMention,
   ChannelType,
   ChatInputCommandInteraction,
+  Colors,
+  ContainerBuilder,
   InteractionContextType,
   MessageFlags,
   PermissionFlagsBits,
   SlashCommandBuilder,
+  TextDisplayBuilder,
   time,
   TimestampStyles,
   userMention,
@@ -44,7 +47,6 @@ export default new Command({
     .addSubcommand((cmd) => cmd.setName('reset').setDescription('Reset the counting game')),
   async execute(interaction) {
     if (!interaction.inCachedGuild()) return;
-    console.log(`Counting command executed`);
 
     await interaction.deferReply({ flags: [MessageFlags.Ephemeral] });
 
@@ -65,7 +67,14 @@ export default new Command({
         break;
       default:
         interaction.editReply({
-          content: 'Unknown subcommand. Please use one of the following: setup, edit, info, reset.',
+          components: [
+            new ContainerBuilder()
+              .setAccentColor(Colors.Red)
+              .addTextDisplayComponents(
+                new TextDisplayBuilder().setContent('### Unknown subcommand\nPlease use one of the following: `setup`, `edit`, `info`, `reset`.'),
+              ),
+          ],
+          flags: [MessageFlags.IsComponentsV2],
         });
         break;
     }
@@ -82,8 +91,16 @@ async function handleSetup(interaction: ChatInputCommandInteraction<'cached'>): 
 
   if (currentCounting) {
     return interaction.editReply({
-      content:
-        'A counting game is already set up in this server. Please use the edit command to change the settings. Or reset the counting game if you want to start over.',
+      components: [
+        new ContainerBuilder()
+          .setAccentColor(Colors.Red)
+          .addTextDisplayComponents(
+            new TextDisplayBuilder().setContent(
+              'A counting game is already set up in this server. Please use the edit command to change the settings. Or reset the counting game if you want to start over.',
+            ),
+          ),
+      ],
+      flags: [MessageFlags.IsComponentsV2],
     });
   }
 
@@ -92,7 +109,16 @@ async function handleSetup(interaction: ChatInputCommandInteraction<'cached'>): 
 
   await createCounting(interaction.guildId, channel.id, resetOnFail);
   return interaction.editReply({
-    content: `Counting game has been set up in <#${channel.id}>. Use the edit command to change the settings or reset the counting game if needed.\n\nTo start counting, simply send the number 1 in the channel.`,
+    components: [
+      new ContainerBuilder()
+        .setAccentColor(Colors.Green)
+        .addTextDisplayComponents(
+          new TextDisplayBuilder().setContent(
+            `Counting game has been set up in ${channelMention(channel.id)}!\nTo start counting, simply send the number \`1\` in the channel.`,
+          ),
+        ),
+    ],
+    flags: [MessageFlags.IsComponentsV2],
   });
 }
 
@@ -106,7 +132,14 @@ async function handleEdit(interaction: ChatInputCommandInteraction<'cached'>): P
 
   if (!currentCounting) {
     return interaction.editReply({
-      content: 'No counting game is set up in this server. Please use the setup command to create one.',
+      components: [
+        new ContainerBuilder()
+          .setAccentColor(Colors.Red)
+          .addTextDisplayComponents(
+            new TextDisplayBuilder().setContent('No counting game is set up in this server. Please use the setup command to create one.'),
+          ),
+      ],
+      flags: [MessageFlags.IsComponentsV2],
     });
   }
 
@@ -115,7 +148,16 @@ async function handleEdit(interaction: ChatInputCommandInteraction<'cached'>): P
 
   if (!channel && resetOnFail === undefined) {
     return interaction.editReply({
-      content: 'You must provide at least one option to edit the counting game. Either a new channel or reset on fail option.',
+      components: [
+        new ContainerBuilder()
+          .setAccentColor(Colors.Red)
+          .addTextDisplayComponents(
+            new TextDisplayBuilder().setContent(
+              'You must provide at least one option to edit the counting game. Either a new channel or reset on fail option.',
+            ),
+          ),
+      ],
+      flags: [MessageFlags.IsComponentsV2],
     });
   }
 
@@ -125,7 +167,12 @@ async function handleEdit(interaction: ChatInputCommandInteraction<'cached'>): P
   });
 
   return interaction.editReply({
-    content: `Counting game has been updated. Channel: <#${currentCounting.channelId}>. Reset on fail: ${currentCounting.resetOnFail}`,
+    components: [
+      new ContainerBuilder()
+        .setAccentColor(Colors.Gold)
+        .addTextDisplayComponents(new TextDisplayBuilder().setContent(`Counting game has been updated. Use the info command to see the current settings.`)),
+    ],
+    flags: [MessageFlags.IsComponentsV2],
   });
 }
 
@@ -139,21 +186,39 @@ async function handleInfo(interaction: ChatInputCommandInteraction<'cached'>): P
 
   if (!currentCounting) {
     return interaction.editReply({
-      content: 'No counting game is set up in this server. Please use the setup command to create one.',
+      components: [
+        new ContainerBuilder()
+          .setAccentColor(Colors.Red)
+          .addTextDisplayComponents(
+            new TextDisplayBuilder().setContent('No counting game is set up in this server. Please use the setup command to create one.'),
+          ),
+      ],
+      flags: [MessageFlags.IsComponentsV2],
     });
   }
 
   return interaction.editReply({
-    content: [
-      `Counting game is set up in ${channelMention(currentCounting.channelId)}`,
-      `Reset on fail: ${currentCounting.resetOnFail ? 'enabled' : 'disabled'}`,
-      `Current number: ${currentCounting.currentNumber ?? 0}`,
-      `Current number by: ${currentCounting.currentNumberByUserId ? userMention(currentCounting.currentNumberByUserId) : 'N/A'}`,
-      `Current number at: ${currentCounting.currentNumberAt ? time(Math.floor(currentCounting.currentNumberAt.getTime() / 1000), TimestampStyles.ShortDateTime) : 'N/A'}`,
-      `Highest number: ${currentCounting.highestNumber ?? 0}`,
-      `Highest number by: ${currentCounting.highestNumberByUserId ? userMention(currentCounting.highestNumberByUserId) : 'N/A'}`,
-      `Highest number at: ${currentCounting.highestNumberAt ? time(Math.floor(currentCounting.highestNumberAt.getTime() / 1000), TimestampStyles.ShortDateTime) : 'N/A'}`,
-    ].join('\n'),
+    components: [
+      new ContainerBuilder()
+        .setAccentColor(Colors.Blue)
+        .addTextDisplayComponents(
+          new TextDisplayBuilder().setContent(
+            `### Counting Game Information\n${[
+              `Counting game is set up in ${channelMention(currentCounting.channelId)}`,
+              `Reset on fail: ${currentCounting.resetOnFail ? 'enabled' : 'disabled'}`,
+              '',
+              `Current number: ${currentCounting.currentNumber ?? 0}`,
+              `Current number by: ${currentCounting.currentNumberByUserId ? userMention(currentCounting.currentNumberByUserId) : 'N/A'}`,
+              `Current number at: ${currentCounting.currentNumberAt ? time(Math.floor(currentCounting.currentNumberAt.getTime() / 1000), TimestampStyles.ShortDateTime) : 'N/A'}`,
+              '',
+              `Highest number: ${currentCounting.highestNumber ?? 0}`,
+              `Highest number by: ${currentCounting.highestNumberByUserId ? userMention(currentCounting.highestNumberByUserId) : 'N/A'}`,
+              `Highest number at: ${currentCounting.highestNumberAt ? time(Math.floor(currentCounting.highestNumberAt.getTime() / 1000), TimestampStyles.ShortDateTime) : 'N/A'}`,
+            ].join('\n')}`,
+          ),
+        ),
+    ],
+    flags: [MessageFlags.IsComponentsV2],
   });
 }
 
@@ -167,13 +232,25 @@ async function handleReset(interaction: ChatInputCommandInteraction<'cached'>): 
 
   if (!currentCounting) {
     return interaction.editReply({
-      content: 'No counting game is set up in this server. Please use the setup command to create one.',
+      components: [
+        new ContainerBuilder()
+          .setAccentColor(Colors.Red)
+          .addTextDisplayComponents(
+            new TextDisplayBuilder().setContent('No counting game is set up in this server. Please use the setup command to create one.'),
+          ),
+      ],
+      flags: [MessageFlags.IsComponentsV2],
     });
   }
 
   await resetCounting(interaction.guildId);
 
   return interaction.editReply({
-    content: 'The counting game has been reset. You can set it up again using the setup command.',
+    components: [
+      new ContainerBuilder()
+        .setAccentColor(Colors.Gold)
+        .addTextDisplayComponents(new TextDisplayBuilder().setContent('The counting game has been reset. You can set it up again using the setup command.')),
+    ],
+    flags: [MessageFlags.IsComponentsV2],
   });
 }

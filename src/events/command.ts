@@ -1,4 +1,4 @@
-import { Collection, Events, MessageFlags, time, TimestampStyles } from 'discord.js';
+import { Collection, Colors, ContainerBuilder, Events, MessageFlags, TextDisplayBuilder, time, TimestampStyles } from 'discord.js';
 
 import { Event } from '../classes/base/event';
 import { getGuildOrCreate } from '../database/guild';
@@ -42,9 +42,15 @@ export default new Event({
           const expirationTimestamp = Math.round(expirationTime / 1_000); // Convert to seconds for discords timestamp format
 
           return interaction.reply({
-            // Using a relative time format for the cooldown message, will show like "in 5 seconds"
-            content: `Please wait, you are on cooldown for this command. Try again ${time(expirationTimestamp, TimestampStyles.RelativeTime)}.`,
-            flags: [MessageFlags.Ephemeral],
+            components: [
+              new ContainerBuilder().setAccentColor(Colors.Red).addTextDisplayComponents(
+                new TextDisplayBuilder().setContent(
+                  // Using a relative time format for the cooldown message, will show like "in 5 seconds"
+                  `Please wait, you are on cooldown for this command. Try again ${time(expirationTimestamp, TimestampStyles.RelativeTime)}.`,
+                ),
+              ),
+            ],
+            flags: [MessageFlags.Ephemeral, MessageFlags.IsComponentsV2],
           });
         }
       }
@@ -64,14 +70,22 @@ export default new Event({
       // If the interaction has already been replied to or deferred, follow up with an error message
       if (interaction.replied || interaction.deferred) {
         await interaction.followUp({
-          content: 'There was an error while executing this command.',
-          flags: [MessageFlags.Ephemeral],
+          components: [
+            new ContainerBuilder()
+              .setAccentColor(Colors.Red)
+              .addTextDisplayComponents(new TextDisplayBuilder().setContent('There was an error while executing this command.')),
+          ],
+          flags: [MessageFlags.Ephemeral, MessageFlags.IsComponentsV2],
         });
       } else {
         // If the interaction has not been replied to, reply with an error message
         await interaction.reply({
-          content: 'There was an error while executing this command.',
-          flags: [MessageFlags.Ephemeral],
+          components: [
+            new ContainerBuilder()
+              .setAccentColor(Colors.Red)
+              .addTextDisplayComponents(new TextDisplayBuilder().setContent('There was an error while executing this command.')),
+          ],
+          flags: [MessageFlags.Ephemeral, MessageFlags.IsComponentsV2],
         });
       }
     }
