@@ -15,7 +15,7 @@ export default new Event({
     if (!counting || message.channelId !== counting.channelId) return;
 
     // Check if the author is the same as the last user who counted
-    if (counting.currentNumberByUserId === message.author.id) {
+    if (counting.lastNumberByUserId === message.author.id) {
       const warnMessage = await message
         .reply({
           components: [
@@ -37,7 +37,7 @@ export default new Event({
     // Check if the message content is a valid number
     const count = parseInt(message.content, 10);
 
-    if (isNaN(count) || count !== counting.currentNumber + 1) {
+    if (isNaN(count) || count !== counting.lastNumber + 1) {
       // If the count is invalid, reset the counting configuration if resetOnFail is true
       if (counting.resetOnFail) {
         await resetCountingCount(message.guildId);
@@ -58,6 +58,6 @@ export default new Event({
     }
 
     // Increment the counting number
-    await incrementCountingCount(message.guildId, message.author.id);
+    await incrementCountingCount(message.guildId, message.author.id, message.id);
   },
 });

@@ -29,14 +29,16 @@ model Counting {
   channelId   String
 
   // State
-  currentNumber         Int       @default(0)
-  currentNumberAt       DateTime?
-  currentNumberByUserId String?
+  lastNumber          Int       @default(0)
+  lastNumberAt        DateTime?
+  lastNumberByUserId  String?
+  lastNumberMessageId String?
 
   // History
-  highestNumber         Int       @default(0)
-  highestNumberAt       DateTime?
-  highestNumberByUserId String?
+  highestNumber          Int       @default(0)
+  highestNumberAt        DateTime?
+  highestNumberByUserId  String?
+  highestNumberMessageId String?
 
   // Timestamps
   createdAt DateTime @default(now())

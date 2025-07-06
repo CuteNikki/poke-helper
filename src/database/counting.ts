@@ -57,24 +57,25 @@ export const resetCounting = async (guildId: string): Promise<Counting> =>
 export const resetCountingCount = async (guildId: string): Promise<Counting> =>
   prisma.counting.update({
     where: { guildId },
-    data: { currentNumber: 0, currentNumberByUserId: null, currentNumberAt: null },
+    data: { lastNumber: 0, lastNumberAt: null, lastNumberByUserId: null, lastNumberMessageId: null },
   });
 
 /**
  * Increment the current counting number for a guild.
  * @param guildId {string} The ID of the guild to increment the counting number for.
  * @param userId {string} The ID of the user who is incrementing the count.
+ * @param messageId {string} The ID of the message that triggered the increment.
  * @returns {Promise<Counting>} The updated counting configuration with the incremented count.
  * @throws {Error} If the counting configuration could not be updated or if it does not exist.
  */
-export const incrementCountingCount = async (guildId: string, userId: string): Promise<Counting> => {
+export const incrementCountingCount = async (guildId: string, userId: string, messageId: string): Promise<Counting> => {
   const currentCounting = await getCounting(guildId);
 
   if (!currentCounting) {
     throw new Error(`Counting configuration not found for guild ID: ${guildId}`);
   }
 
-  const newCount = currentCounting.currentNumber + 1;
+  const newCount = currentCounting.lastNumber + 1;
   const highestNumber = currentCounting.highestNumber || 0;
   const isHigherNumber = newCount > highestNumber;
   const now = new Date();
@@ -82,13 +83,15 @@ export const incrementCountingCount = async (guildId: string, userId: string): P
   return await prisma.counting.update({
     where: { guildId },
     data: {
-      currentNumber: newCount,
-      currentNumberAt: now,
-      currentNumberByUserId: userId,
+      lastNumber: newCount,
+      lastNumberAt: now,
+      lastNumberByUserId: userId,
+      lastNumberMessageId: messageId,
       // Update highest number if the new count is higher
       highestNumber: Math.max(highestNumber, newCount),
       highestNumberAt: isHigherNumber ? now : currentCounting.highestNumberAt,
       highestNumberByUserId: isHigherNumber ? userId : currentCounting.highestNumberByUserId,
+      highestNumberMessageId: isHigherNumber ? messageId : currentCounting.highestNumberMessageId,
     },
   });
 };
