@@ -29,10 +29,10 @@ model Counting {
   channelId   String
 
   // State
-  lastNumber          Int       @default(0)
-  lastNumberAt        DateTime?
-  lastNumberByUserId  String?
-  lastNumberMessageId String?
+  lastNumber          Int       @default(0) @map("currentNumber")
+  lastNumberAt        DateTime? @map("currentNumberAt")
+  lastNumberMessageId String?   @map("currentNumberMessageId")
+  lastNumberByUserId  String?   @map("currentNumberByUserId")
 
   // History
   highestNumber          Int       @default(0)
