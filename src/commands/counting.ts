@@ -48,8 +48,6 @@ export default new Command({
   async execute(interaction) {
     if (!interaction.inCachedGuild()) return;
 
-    await interaction.deferReply({ flags: [MessageFlags.Ephemeral] });
-
     const subcommand = interaction.options.getSubcommand();
 
     switch (subcommand) {
@@ -66,7 +64,7 @@ export default new Command({
         await handleReset(interaction);
         break;
       default:
-        interaction.editReply({
+        interaction.reply({
           components: [
             new ContainerBuilder()
               .setAccentColor(Colors.Red)
@@ -74,7 +72,7 @@ export default new Command({
                 new TextDisplayBuilder().setContent('### Unknown subcommand\nPlease use one of the following: `setup`, `edit`, `info`, `reset`.'),
               ),
           ],
-          flags: [MessageFlags.IsComponentsV2],
+          flags: [MessageFlags.IsComponentsV2, MessageFlags.Ephemeral],
         });
         break;
     }
@@ -87,6 +85,7 @@ export default new Command({
  * @returns {Promise<unknown>} A promise that resolves when the setup is complete.
  */
 async function handleSetup(interaction: ChatInputCommandInteraction<'cached'>): Promise<unknown> {
+  await interaction.deferReply({ flags: [MessageFlags.Ephemeral] });
   const currentCounting = await getCounting(interaction.guildId);
 
   if (currentCounting) {
@@ -128,6 +127,7 @@ async function handleSetup(interaction: ChatInputCommandInteraction<'cached'>): 
  * @returns {Promise<unknown>} A promise that resolves when the edit is complete.
  */
 async function handleEdit(interaction: ChatInputCommandInteraction<'cached'>): Promise<unknown> {
+  await interaction.deferReply({ flags: [MessageFlags.Ephemeral] });
   const currentCounting = await getCounting(interaction.guildId);
 
   if (!currentCounting) {
@@ -185,7 +185,7 @@ async function handleInfo(interaction: ChatInputCommandInteraction<'cached'>): P
   const currentCounting = await getCounting(interaction.guildId);
 
   if (!currentCounting) {
-    return interaction.editReply({
+    return interaction.reply({
       components: [
         new ContainerBuilder()
           .setAccentColor(Colors.Red)
@@ -193,11 +193,11 @@ async function handleInfo(interaction: ChatInputCommandInteraction<'cached'>): P
             new TextDisplayBuilder().setContent('No counting game is set up in this server. Please use the setup command to create one.'),
           ),
       ],
-      flags: [MessageFlags.IsComponentsV2],
+      flags: [MessageFlags.IsComponentsV2, MessageFlags.Ephemeral],
     });
   }
 
-  return interaction.editReply({
+  return interaction.reply({
     components: [
       new ContainerBuilder()
         .setAccentColor(Colors.Blue)
@@ -220,6 +220,7 @@ async function handleInfo(interaction: ChatInputCommandInteraction<'cached'>): P
           ),
         ),
     ],
+    allowedMentions: { parse: [] },
     flags: [MessageFlags.IsComponentsV2],
   });
 }
@@ -230,6 +231,7 @@ async function handleInfo(interaction: ChatInputCommandInteraction<'cached'>): P
  * @returns {Promise<unknown>} A promise that resolves when the reset is complete.
  */
 async function handleReset(interaction: ChatInputCommandInteraction<'cached'>): Promise<unknown> {
+  await interaction.deferReply({ flags: [MessageFlags.Ephemeral] });
   const currentCounting = await getCounting(interaction.guildId);
 
   if (!currentCounting) {
