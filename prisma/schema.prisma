@@ -24,8 +24,11 @@ model UserBirthday {
   User   User   @relation("UserBirthday", fields: [userId], references: [userId])
 
   // Configuration
-  date     DateTime
-  timezone String?
+  date                      DateTime
+  timezone                  String?
+  showAge                   Boolean  @default(false)
+  announceInGuildsByDefault Boolean  @default(false)
+  announceInGuildIds        String[] @default([])
 
   // Timestamps
   createdAt DateTime @default(now())

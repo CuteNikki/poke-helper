@@ -1,7 +1,9 @@
 import { Collection, Colors, ContainerBuilder, Events, MessageFlags, TextDisplayBuilder, time, TimestampStyles } from 'discord.js';
 
 import { Event } from '../classes/base/event';
+
 import { getGuildOrCreate } from '../database/guild';
+import { getOrCreateUser } from '../database/user';
 
 export default new Event({
   name: Events.InteractionCreate,
@@ -16,6 +18,9 @@ export default new Event({
       console.warn(`Command not found: ${interaction.commandName}`);
       return;
     }
+
+    // Ensure the user is in the database
+    await getOrCreateUser(interaction.user.id);
 
     // Ensure the guild is in the database
     if (interaction.inGuild()) {
