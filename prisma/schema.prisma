@@ -8,20 +8,59 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model Guild {
-  guildId String @id
+model User {
+  userId String @id
 
   // Configuration
-  counting Counting? @relation("GuildCounting")
+  birthday UserBirthday? @relation("UserBirthday")
 
   // Timestamps
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
 
-model Counting {
-  id      Int    @id @default(autoincrement())
-  guildId String @unique
+model UserBirthday {
+  userId String @id
+  User   User   @relation("UserBirthday", fields: [userId], references: [userId])
+
+  // Configuration
+  date     DateTime
+  timezone String?
+
+  // Timestamps
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Guild {
+  guildId String @id
+
+  // Configuration
+  counting GuildCounting? @relation("GuildCounting")
+  birthday GuildBirthday? @relation("GuildBirthday")
+
+  // Timestamps
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model GuildBirthday {
+  guildId String @id
+  guild   Guild  @relation("GuildBirthday", fields: [guildId], references: [guildId])
+
+  // Configuration
+  channelId String
+
+  // Timestamps
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Indexes
+  @@unique([guildId, channelId])
+}
+
+model GuildCounting {
+  guildId String @id
   Guild   Guild  @relation("GuildCounting", fields: [guildId], references: [guildId])
 
   // Configuration

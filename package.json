@@ -14,16 +14,16 @@
     "@types/bun": "latest",
     "eslint": "^9.30.0",
     "prettier": "^3.6.2",
+    "prisma": "^6.16.1",
     "typescript-eslint": "^8.35.1"
   },
   "peerDependencies": {
     "typescript": "^5.8.3"
   },
   "dependencies": {
-    "@prisma/client": "^6.11.1",
+    "@prisma/client": "^6.16.1",
     "chalk": "^5.4.1",
     "discord.js": "^14.21.0",
-    "globby": "^14.1.0",
-    "prisma": "^6.11.1"
+    "globby": "^14.1.0"
   }
 }
